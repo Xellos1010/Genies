@@ -6,6 +6,7 @@ using UnityEngine;
 public class RotateAvatarInputController : MonoBehaviour
 {
     public float speed = 0.1f;
+    private bool isTouchEnabled;
     Touch cachedTouch;
     public Vector3 initialPositionCache;
     public RotationController rotationController;
@@ -51,16 +52,27 @@ public class RotateAvatarInputController : MonoBehaviour
                 initialPositionCache = Input.mousePosition;
 #endif
 #if UNITY_ANDROID
+
             if (Input.touchCount > 0)
             {
+                isTouchEnabled = true;
                 cachedTouch = Input.GetTouch(0);
-                IncreaseOffsetXBy(initialPositionCache , cachedTouch.position);
+                if(cachedTouch.phase == TouchPhase.Moved)
+                    IncreaseOffsetXBy(initialPositionCache , cachedTouch.position);
                 if(cachedTouch.phase == TouchPhase.Ended || cachedTouch.phase == TouchPhase.Canceled)
                 {
                     ResetInitialPosition();
                 }
                 else
                     initialPositionCache = cachedTouch.position;
+            }
+            else
+            {
+                if(isTouchEnabled)
+                {
+                    isTouchEnabled = false;
+                    ResetInitialPosition();
+                }
             }
         }
 #endif
